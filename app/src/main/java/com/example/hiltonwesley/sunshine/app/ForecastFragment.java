@@ -34,13 +34,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-
 /**
- * A placeholder fragment containing a simple view.
+ * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
  */
 public class ForecastFragment extends Fragment {
 
-    private ArrayAdapter<String> forecastAdapter;
+    private ArrayAdapter<String> mForecastAdapter;
 
     public ForecastFragment() {
     }
@@ -74,9 +73,9 @@ public class ForecastFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
+        // The ArrayAdapter will take data from a source and
         // use it to populate the ListView it's attached to.
-        forecastAdapter =
+        mForecastAdapter =
                 new ArrayAdapter<String>(
                         getActivity(), // The current context (this activity)
                         R.layout.list_item_forecast, // The name of the layout ID.
@@ -87,36 +86,34 @@ public class ForecastFragment extends Fragment {
 
         // Get a reference to the ListView, and attach this adapter to it.
         ListView listView = (ListView) rootView.findViewById(R.id.listView_forecast);
-        listView.setAdapter(forecastAdapter);
+        listView.setAdapter(mForecastAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
             @Override
-            public void onItemClick(AdapterView<?> adapterView,View view,int position,long l){
-
-                String forecast = forecastAdapter.getItem(position);
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                String forecast = mForecastAdapter.getItem(position);
                 Intent intent = new Intent(getActivity(), DetailActivity.class)
-                                                .putExtra(Intent.EXTRA_TEXT, forecast);
-                                startActivity(intent);
+                        .putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(intent);
             }
-
         });
-
-
 
         return rootView;
     }
-    private void updateWeather() {
-                FetchWeatherTask weatherTask = new FetchWeatherTask();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                String location = prefs.getString(getString(R.string.pref_location_key),
-                                getString(R.string.pref_location_default));
-                weatherTask.execute(location);
-            }
 
-                @Override
-        public void onStart() {
-                super.onStart();
-                updateWeather();
-            }
+    private void updateWeather() {
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
@@ -128,22 +125,33 @@ public class ForecastFragment extends Fragment {
         private String getReadableDateString(long time){
             // Because the API returns a unix timestamp (measured in seconds),
             // it must be converted to milliseconds in order to be converted to valid date.
-           Date date = new Date(time * 1000);
-           SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
-           return format.format(date).toString();
+            Date date = new Date(time * 1000);
+            SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
+            return format.format(date).toString();
         }
 
         /**
          * Prepare the weather high/lows for presentation.
          */
-        private String formatHighLows(double high, double low, String unitType) {
+        private String formatHighLows(double high, double low) {
+            // Data is fetched in Celsius by default.
+            // If user prefers to see in Fahrenheit, convert the values here.
+            // We do this rather than fetching in Fahrenheit so that the user can
+            // change this option without us having to re-fetch the data once
+            // we start storing the values in a database.
+            SharedPreferences sharedPrefs =
+                    PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String unitType = sharedPrefs.getString(
+                    getString(R.string.pref_units_key),
+                    getString(R.string.pref_units_metric));
 
-                               if (unitType.equals(getString(R.string.pref_units_imperial))) {
-                               high = (high * 1.8) + 32;
-                               low = (low * 1.8) + 32;
-                          } else if (!unitType.equals(getString(R.string.pref_units_metric))) {
-                               Log.d(LOG_TAG, "Unit type not found: " + unitType);
-                            }
+            if (unitType.equals(getString(R.string.pref_units_imperial))) {
+                high = (high * 1.8) + 32;
+                low = (low * 1.8) + 32;
+            } else if (!unitType.equals(getString(R.string.pref_units_metric))) {
+                Log.d(LOG_TAG, "Unit type not found: " + unitType);
+            }
+
             // For presentation, assume the user doesn't care about tenths of a degree.
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
@@ -174,18 +182,7 @@ public class ForecastFragment extends Fragment {
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
-
             String[] resultStrs = new String[numDays];
-                        // Data is fetched in Celsius by default.
-                        // If user prefers to see in Fahrenheit, convert the values here.
-                        // We do this rather than fetching in Fahrenheit so that the user can
-                        // change this option without us having to re-fetch the data once
-                        // we start storing the values in a database.
-                       SharedPreferences sharedPrefs =
-                                       PreferenceManager.getDefaultSharedPreferences(getActivity());
-                       String unitType = sharedPrefs.getString(
-                                       getString(R.string.pref_units_key),
-                                       getString(R.string.pref_units_metric));
             for(int i = 0; i < weatherArray.length(); i++) {
                 // For now, using the format "Day, description, hi/low"
                 String day;
@@ -211,11 +208,9 @@ public class ForecastFragment extends Fragment {
                 double high = temperatureObject.getDouble(OWM_MAX);
                 double low = temperatureObject.getDouble(OWM_MIN);
 
-                highAndLow = formatHighLows(high, low, unitType);
+                highAndLow = formatHighLows(high, low);
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
-
-
             return resultStrs;
 
         }
@@ -259,8 +254,6 @@ public class ForecastFragment extends Fragment {
 
                 URL url = new URL(builtUri.toString());
 
-
-
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -288,8 +281,6 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
-
-
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
@@ -322,9 +313,9 @@ public class ForecastFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
             if (result != null) {
-                forecastAdapter.clear();
+                mForecastAdapter.clear();
                 for(String dayForecastStr : result) {
-                    forecastAdapter.add(dayForecastStr);
+                    mForecastAdapter.add(dayForecastStr);
                 }
                 // New data is back from the server.  Hooray!
             }
