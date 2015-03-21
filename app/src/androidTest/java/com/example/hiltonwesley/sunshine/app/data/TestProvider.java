@@ -338,7 +338,7 @@ public class TestProvider extends AndroidTestCase {
 
         // Did our content observer get called?  Students:  If this fails, your insert weather
         // in your ContentProvider isn't calling
-        // getContext().getContentResolver().notifyChange(uri, null);
+        //getContext().getContentResolver().notifyChange(uri, null);
         tco.waitForNotificationOrFail();
         mContext.getContentResolver().unregisterContentObserver(tco);
 
@@ -412,7 +412,7 @@ public class TestProvider extends AndroidTestCase {
         deleteAllRecordsFromProvider();
 
         // Students: If either of these fail, you most-likely are not calling the
-        // getContext().getContentResolver().notifyChange(uri, null); in the ContentProvider
+        //getContext().getContentResolver().notifyChange(uri, null); in the ContentProvider
         // delete.  (only if the insertReadProvider is succeeding)
         locationObserver.waitForNotificationOrFail();
         weatherObserver.waitForNotificationOrFail();
