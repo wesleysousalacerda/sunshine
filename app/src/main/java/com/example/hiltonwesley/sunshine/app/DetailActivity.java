@@ -63,10 +63,13 @@ public class DetailActivity extends ActionBarActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            Intent intent = getActivity().getIntent();
+
+
             View rootView = inflater.inflate(com.example.hiltonwesley.sunshine.app.R.layout.fragment_detail, container, false);
-            if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-                mForecastStr = intent.getStringExtra(Intent.EXTRA_TEXT);
+            // The detail Activity called via intent.  Inspect the intent for forecast data.
+            Intent intent = getActivity().getIntent();
+            if (intent != null) {
+                mForecastStr = intent.getDataString();
             }
             if (null != mForecastStr) {
                     ((TextView) rootView.findViewById(R.id.detail_text))
