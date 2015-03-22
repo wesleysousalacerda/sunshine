@@ -1,19 +1,19 @@
 package com.example.hiltonwesley.sunshine.app.data;
 
-        import android.content.ContentValues;
-        import android.content.Context;
-        import android.database.ContentObserver;
-        import android.database.Cursor;
-        import android.database.sqlite.SQLiteDatabase;
-        import android.net.Uri;
-        import android.os.Handler;
-        import android.os.HandlerThread;
-        import android.test.AndroidTestCase;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.test.AndroidTestCase;
 
-        import com.example.hiltonwesley.sunshine.app.utils.PollingCheck;
+import com.example.hiltonwesley.sunshine.app.utils.PollingCheck;
 
-        import java.util.Map;
-        import java.util.Set;
+import java.util.Map;
+import java.util.Set;
 
 /*
     Students: These are functions and some test data to make it easier to test your database and
@@ -67,7 +67,7 @@ public class TestUtilities extends AndroidTestCase {
         LocationEntry part of the WeatherContract.
      */
     static ContentValues createNorthPoleLocationValues() {
-        //Create a new map of values, where column names are the keys
+        // Create a new map of values, where column names are the keys
         ContentValues testValues = new ContentValues();
         testValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, TEST_LOCATION);
         testValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, "North Pole");
@@ -77,11 +77,12 @@ public class TestUtilities extends AndroidTestCase {
         return testValues;
     }
 
-
-    //        Students: You can uncomment this function once you have finished creating the
-//        LocationEntry part of the WeatherContract as well as the WeatherDbHelper.
+    /*
+        Students: You can uncomment this function once you have finished creating the
+        LocationEntry part of the WeatherContract as well as the WeatherDbHelper.
+     */
     static long insertNorthPoleLocationValues(Context context) {
-//        insert our test records into the database
+        // insert our test records into the database
         WeatherDbHelper dbHelper = new WeatherDbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues testValues = TestUtilities.createNorthPoleLocationValues();

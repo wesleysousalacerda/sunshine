@@ -24,8 +24,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
-import com.example.hiltonwesley.sunshine.app.data.WeatherContract.LocationEntry;
-import com.example.hiltonwesley.sunshine.app.data.WeatherContract.WeatherEntry;
+import com.example.android.sunshine.app.data.WeatherContract.LocationEntry;
+import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
+import com.example.hiltonwesley.sunshine.app.data.TestUtilities;
 
 /*
     Note: This is not a complete set of tests of the Sunshine ContentProvider, but it does test
@@ -81,20 +82,20 @@ public class TestProvider extends AndroidTestCase {
     }
 
     /*
- 		81	       This helper function deletes all records from both database tables using the database
- 		82	       functions only.  This is designed to be used to reset the state of the database until the
- 		83	       delete functionality is available in the ContentProvider.
- 		84	     */
-    	    public void deleteAllRecordsFromDB() {
-        	        WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
-        	        SQLiteDatabase db = dbHelper.getWritableDatabase();
+       This helper function deletes all records from both database tables using the database
+       functions only.  This is designed to be used to reset the state of the database until the
+       delete functionality is available in the ContentProvider.
+     */
+    public void deleteAllRecordsFromDB() {
+        WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        	        db.delete(WeatherEntry.TABLE_NAME, null, null);
-        	        db.delete(LocationEntry.TABLE_NAME, null, null);
-        	        db.close();
-        	    }
+        db.delete(WeatherEntry.TABLE_NAME, null, null);
+        db.delete(LocationEntry.TABLE_NAME, null, null);
+        db.close();
+    }
 
-            	    /*
+    /*
         Student: Refactor this function to use the deleteAllRecordsFromProvider functionality once
         you have implemented delete functionality there.
      */
@@ -349,7 +350,7 @@ public class TestProvider extends AndroidTestCase {
 //
 //        // Did our content observer get called?  Students:  If this fails, your insert weather
 //        // in your ContentProvider isn't calling
-//        //getContext().getContentResolver().notifyChange(uri, null);
+//        // getContext().getContentResolver().notifyChange(uri, null);
 //        tco.waitForNotificationOrFail();
 //        mContext.getContentResolver().unregisterContentObserver(tco);
 //
@@ -423,7 +424,7 @@ public class TestProvider extends AndroidTestCase {
 //        deleteAllRecordsFromProvider();
 //
 //        // Students: If either of these fail, you most-likely are not calling the
-//        //getContext().getContentResolver().notifyChange(uri, null); in the ContentProvider
+//        // getContext().getContentResolver().notifyChange(uri, null); in the ContentProvider
 //        // delete.  (only if the insertReadProvider is succeeding)
 //        locationObserver.waitForNotificationOrFail();
 //        weatherObserver.waitForNotificationOrFail();
