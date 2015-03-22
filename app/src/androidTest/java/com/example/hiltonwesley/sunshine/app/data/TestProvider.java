@@ -24,9 +24,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
-import com.example.android.sunshine.app.data.WeatherContract.LocationEntry;
-import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
-import com.example.hiltonwesley.sunshine.app.data.TestUtilities;
+import com.example.hiltonwesley.sunshine.app.data.WeatherContract.LocationEntry;
+import com.example.hiltonwesley.sunshine.app.data.WeatherContract.WeatherEntry;
 
 /*
     Note: This is not a complete set of tests of the Sunshine ContentProvider, but it does test
