@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:minHeight="?android:attr/listPreferredItemHeight"
-        android:orientation="horizontal"
-        android:padding="16dp">
+    android:orientation="horizontal"
+    android:padding="16dp">
 
         <ImageView
             android:id="@+id/list_item_icon"
