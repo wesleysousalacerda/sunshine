@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.example.hiltonwesley.sunshine.app;
-
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,7 +22,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.format.Time;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import com.example.hiltonwesley.sunshine.app.data.WeatherContract;
 import com.example.hiltonwesley.sunshine.app.data.WeatherContract.WeatherEntry;
@@ -44,17 +42,13 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
-    private ArrayAdapter<String> mForecastAdapter;
     private final Context mContext;
 
     public FetchWeatherTask(Context context) {
         mContext = context;
-
     }
 
     private boolean DEBUG = true;
-
-
 
     /**
      * Helper method to handle insertion of a new location in the weather database.
@@ -68,44 +62,43 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
     long addLocation(String locationSetting, String cityName, double lat, double lon) {
         long locationId;
 
-                        // First, check if the location with this city name exists in the db
-                        Cursor locationCursor = mContext.getContentResolver().query(
-                                WeatherContract.LocationEntry.CONTENT_URI,
-                                new String[]{WeatherContract.LocationEntry._ID},
-                                WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
-                                new String[]{locationSetting},
-                                null);
+        // First, check if the location with this city name exists in the db
+        Cursor locationCursor = mContext.getContentResolver().query(
+                WeatherContract.LocationEntry.CONTENT_URI,
+                new String[]{WeatherContract.LocationEntry._ID},
+                WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
+                new String[]{locationSetting},
+                null);
 
-                        if (locationCursor.moveToFirst()) {
-                        int locationIdIndex = locationCursor.getColumnIndex(WeatherContract.LocationEntry._ID);
-                        locationId = locationCursor.getLong(locationIdIndex);
-                    } else {
-                        // Now that the content provider is set up, inserting rows of data is pretty simple.
-                                // First create a ContentValues object to hold the data you want to insert.
-                                        ContentValues locationValues = new ContentValues();
+        if (locationCursor.moveToFirst()) {
+            int locationIdIndex = locationCursor.getColumnIndex(WeatherContract.LocationEntry._ID);
+            locationId = locationCursor.getLong(locationIdIndex);
+        } else {
+            // Now that the content provider is set up, inserting rows of data is pretty simple.
+            // First create a ContentValues object to hold the data you want to insert.
+            ContentValues locationValues = new ContentValues();
 
-                                // Then add the data, along with the corresponding name of the data type,
-                                        // so the content provider knows what kind of value is being inserted.
-                                                locationValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
-                        locationValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
-                        locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, lat);
-                        locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
+            // Then add the data, along with the corresponding name of the data type,
+            // so the content provider knows what kind of value is being inserted.
+            locationValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
+            locationValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
+            locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, lat);
+            locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
 
-                                // Finally, insert location data into the database.
-                                        Uri insertedUri = mContext.getContentResolver().insert(
-                                        WeatherContract.LocationEntry.CONTENT_URI,
-                                        locationValues
-                                        );
+            // Finally, insert location data into the database.
+            Uri insertedUri = mContext.getContentResolver().insert(
+                    WeatherContract.LocationEntry.CONTENT_URI,
+                    locationValues
+            );
 
-                                // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
-                                        locationId = ContentUris.parseId(insertedUri);
-                    }
+            // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+            locationId = ContentUris.parseId(insertedUri);
+        }
 
-                        locationCursor.close();
-                // Wait, that worked?  Yes!
-                        return locationId;
+        locationCursor.close();
+        // Wait, that worked?  Yes!
+        return locationId;
     }
-
 
     /**
      * Take the String representing the complete forecast in JSON Format and
@@ -115,7 +108,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
      * into an Object hierarchy for us.
      */
     private void getWeatherDataFromJson(String forecastJsonStr,
-                                            String locationSetting)
+                                        String locationSetting)
             throws JSONException {
 
         // Now we have a String representing the complete forecast in JSON Format.
@@ -224,7 +217,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 ContentValues weatherValues = new ContentValues();
 
                 weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationId);
-                weatherValues.put(WeatherEntry.COLUMN_DATETEXT, dateTime);
+                weatherValues.put(WeatherEntry.COLUMN_DATE, dateTime);
                 weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, humidity);
                 weatherValues.put(WeatherEntry.COLUMN_PRESSURE, pressure);
                 weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
@@ -236,11 +229,12 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
                 cVVector.add(weatherValues);
             }
+
             int inserted = 0;
             // add to database
             if ( cVVector.size() > 0 ) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
-                                cVVector.toArray(cvArray);
+                cVVector.toArray(cvArray);
                 inserted = mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, cvArray);
             }
 
@@ -250,7 +244,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -276,7 +269,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
         try {
             // Construct the URL for the OpenWeatherMap query
-            // Possible parameters are available at OWM's forecast API page, at
+            // Possible parameters are avaiable at OWM's forecast API page, at
             // http://openweathermap.org/API#forecast
             final String FORECAST_BASE_URL =
                     "http://api.openweathermap.org/data/2.5/forecast/daily?";
@@ -327,8 +320,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
         } catch (JSONException e) {
-                        Log.e(LOG_TAG, e.getMessage(), e);
-                        e.printStackTrace();
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -341,9 +334,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 }
             }
         }
-
-
         return null;
     }
-
 }
