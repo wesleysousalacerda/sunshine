@@ -1,5 +1,5 @@
 package com.example.hiltonwesley.sunshine.app;
-import android.content.Intent;
+
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,11 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.hiltonwesley.sunshine.app.data.WeatherContract;
-import com.example.hiltonwesley.sunshine.app.service.SunshineService;
-
-/**
- * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
- */
+import com.example.hiltonwesley.sunshine.app.sync.SunshineSyncAdapter;
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private ForecastAdapter mForecastAdapter;
 
@@ -165,10 +161,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void updateWeather() {
-        Intent intent = new Intent(getActivity(), SunshineService.class);
-        intent.putExtra(SunshineService.LOCATION_QUERY_EXTRA,
-                Utility.getPreferredLocation(getActivity()));
-        getActivity().startService(intent);
+        //String location = Utility.getPreferredLocation(getActivity());
+                //new FetchWeatherTask(getActivity()).execute(location);
+                        SunshineSyncAdapter.syncImmediately(getActivity());
     }
 
     @Override
