@@ -1,4 +1,5 @@
 package com.example.hiltonwesley.sunshine.app.sync;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.NotificationManager;
@@ -293,11 +294,6 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
                 getContext().getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, cvArray);
-
-                // delete old data so we don't build up an endless history
-                getContext().getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
-                        WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?",
-                        new String[] {Long.toString(dayTime.setJulianDay(julianStartDay-1))});
 
                 notifyWeather();
             }
